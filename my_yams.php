@@ -53,7 +53,7 @@ class Yams {
             }
         }
     }
-    
+
     public function Loop_Check (Closure $filterFunc) {
 		return count(array_filter($this->perms, $filterFunc)) / pow(6, $this->rolls) * 100;
 	}
@@ -66,8 +66,8 @@ class Yams {
 			if($win_result <= 0)
 				return $this->displayResult(100);
 
-			$filterFunc = function($v) use ($win_result){
-				return @array_count_values($v)[$this->params[0]] >= $win_result;
+			$filterFunc = function($value) use($win_result){
+				return @array_count_values($value)[$this->params[0]] >= $win_result;
 			};
 		}
 		$this->rolls = 5 - $save;
