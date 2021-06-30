@@ -8,14 +8,77 @@ if(array_key_exists('h', $options) || array_key_exists('help', $options)){
 
 class Yams {
 
-    public $args;
+	public $args;
     public $params;
 	public $groups = ['paire', 'brelan', 'suite', 'full', 'carre', 'yams'];
+	public $dice = [];
+    public $rolls = 0;
+	public $perms = [];
     public $group;
 
 	public function __construct ($args) {
 		$this->args = $args;
 		$this->args_Check();
+		$this->result();
+	}
+
+	public function Loop ($numbers) {
+        for($i = 1; $i < 7; $i ++){
+            if($numbers === 1){ 
+                $this->perms[] = [$i];
+            }else{
+                for($ii = 1; $ii < 7; $ii ++){
+                    if($numbers === 2){
+                        $this->perms[] = [$i, $ii];
+                    }else{
+                        for($iii = 1; $iii < 7; $iii ++){
+                            if($numbers === 3){
+                                $this->perms[] = [$i, $ii, $iii];
+                            }else{
+                                for($iiii = 1; $iiii < 7; $iiii ++){
+                                    if($numbers === 4){
+                                        $this->perms[] = [$i, $ii, $iii, $iiii];
+                                    }else{
+                                        for($iiiii = 1; $iiiii < 7; $iiiii ++){
+                                            if($numbers === 5){
+                                                $this->perms[] = [$i, $ii, $iii, $iiii, $iiiii];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public function Loop_Check (Closure $filterFunc) {
+		return count(array_filter($this->perms, $filterFunc)) / pow(6, $this->rolls) * 100;
+	}
+
+	public function result () {
+		if(in_array($this->group, ['paire', 'brelan', 'carre', 'yams'])){
+			$save = @array_count_values($this->dice)[$this->params[0]] ?: 0;
+			$win_result =  ['paire' => 2, 'brelan' => 3, 'carre' => 4, 'yams' => 5][$this->group] - $save;
+			
+			if($win_result <= 0)
+				return $this->displayResult(100);
+
+			$filterFunc = function($v) use ($win_result){
+				return @array_count_values($v)[$this->params[0]] >= $win_result;
+			};
+		}
+		$this->rolls = 5 - $save;
+		$this->Loop($this->rolls);
+		$this->displayResult($this->Loop_Check($filterFunc));
+	}
+
+	
+
+	public function displayResult ($value) {	
+		echo number_format($value, 2)."%\n";
 	}
 
 	public static function manYams () {
